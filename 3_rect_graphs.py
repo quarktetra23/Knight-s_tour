@@ -58,8 +58,38 @@ def draw_board(screen, board, knight_positions):
     pygame.display.flip()
 
 
+def draw_structure(screen, knight_positions):
+    # Create a new window to display the structure
+    structure_screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("Knight's Tour Structure")
+
+    # Draw lines for the structure
+    for i in range(len(knight_positions) - 1):
+        pygame.draw.line(structure_screen, RED,
+                         (knight_positions[i][1] * CELL_SIZE + CELL_SIZE // 2,
+                          knight_positions[i][0] * CELL_SIZE + CELL_SIZE // 2),
+                         (knight_positions[i + 1][1] * CELL_SIZE + CELL_SIZE // 2,
+                          knight_positions[i + 1][0] * CELL_SIZE + CELL_SIZE // 2), 5)
+
+    # Draw circles for knight's positions
+    for pos in knight_positions:
+        pygame.draw.circle(structure_screen, RED,
+                           (pos[1] * CELL_SIZE + CELL_SIZE // 2, pos[0] * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 4, 1)
+
+    pygame.display.flip()
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.quit()
+                sys.exit()
+
+
 def solve_knights_tour(screen, board, x, y, move_number, knight_positions):
     if move_number == BOARD_HEIGHT * BOARD_WIDTH + 1:
+        draw_structure(screen, knight_positions)
         return True
 
     for move in warnsdorff_order(x, y, board):
