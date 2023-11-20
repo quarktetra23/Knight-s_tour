@@ -103,6 +103,19 @@ def solve_knights_tour(screen, board, x, y, move_number, start_x, start_y):
     return False
 
 
+def get_user_input():
+    while True:
+        try:
+            start_x = int(input("Enter the starting row (0 to 7): "))
+            start_y = int(input("Enter the starting column (0 to 23): "))
+            if 0 <= start_x < BOARD_HEIGHT and 0 <= start_y < BOARD_WIDTH:
+                return start_x, start_y
+            else:
+                print("Invalid input. Row must be between 0 and 7, and column must be between 0 and 23.")
+        except ValueError:
+            print("Invalid input. Please enter valid integers.")
+
+
 def main():
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -111,9 +124,8 @@ def main():
     # Initialize the chessboard with -1
     board = [[-1 for _ in range(BOARD_WIDTH)] for _ in range(BOARD_HEIGHT)]
 
-    # Get a random starting position
-    import random
-    start_x, start_y = random.randint(0, BOARD_HEIGHT - 1), random.randint(0, BOARD_WIDTH - 1)
+    # Get user input for the starting position
+    start_x, start_y = get_user_input()
     board[start_x][start_y] = 1
 
     draw_board(screen, board, start_x, start_y, start_x, start_y)
@@ -126,13 +138,9 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-
-    pygame.quit()
-    sys.exit()
+                pygame.quit()
+                sys.exit()
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except SystemExit:
-        pass
+    main()
