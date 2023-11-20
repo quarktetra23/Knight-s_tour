@@ -12,6 +12,7 @@ HEIGHT = BOARD_HEIGHT * CELL_SIZE
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
+GREEN = (0, 255, 0)
 
 # Knight moves
 MOVES = [
@@ -35,15 +36,15 @@ def count_accessible_neighbors(x, y, board):
     return sum(1 for move in MOVES if is_valid_move(x + move[0], y + move[1], board))
 
 
-def draw_board(screen, board, start_x, start_y):
+def draw_board(screen, board, start_x, start_y, end_x, end_y):
     for i in range(BOARD_HEIGHT):
         for j in range(BOARD_WIDTH):
             color = WHITE if (i + j) % 2 == 0 else BLACK
             pygame.draw.rect(screen, color, (j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
-    # Highlight the start and end positions with yellow outlines
+    # Highlight the start and end positions with yellow and green outlines
     pygame.draw.rect(screen, (255, 255, 0), (start_y * CELL_SIZE, start_x * CELL_SIZE, CELL_SIZE, CELL_SIZE), 3)
-    pygame.draw.rect(screen, (255, 255, 0), ((BOARD_WIDTH - 1) * CELL_SIZE, (BOARD_HEIGHT - 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE), 3)
+    pygame.draw.rect(screen, GREEN, (end_y * CELL_SIZE, end_x * CELL_SIZE, CELL_SIZE, CELL_SIZE), 3)
 
     # Draw yellow outlines for the 8 x 8 squares
     for i in range(0, BOARD_HEIGHT, 8):
@@ -60,22 +61,8 @@ def draw_board(screen, board, start_x, start_y):
                 text = font.render(str(board[i][j]), True, RED)
                 text_rect = text.get_rect(center=(j * CELL_SIZE + CELL_SIZE // 2, i * CELL_SIZE + CELL_SIZE // 2))
                 screen.blit(text, text_rect)
-    
+
     pygame.display.flip()
-
-
-
-def get_user_input():
-    while True:
-        try:
-            start_x = int(input("Enter the starting row (0 to {}): ".format(BOARD_HEIGHT - 1)))
-            start_y = int(input("Enter the starting column (0 to {}): ".format(BOARD_WIDTH - 1)))
-            if 0 <= start_x < BOARD_HEIGHT and 0 <= start_y < BOARD_WIDTH:
-                return start_x, start_y
-            else:
-                print(f"Invalid input. Row and column must be between 0 and {BOARD_WIDTH - 1}.")
-        except ValueError:
-            print("Invalid input. Please enter valid integers.")
 
 
 def solve_knights_tour(screen, board, x, y, move_number, start_x, start_y):
@@ -88,7 +75,7 @@ def solve_knights_tour(screen, board, x, y, move_number, start_x, start_y):
 
         if is_valid_move(next_x, next_y, board):
             board[next_x][next_y] = move_number
-            draw_board(screen, board, start_x, start_y)
+            draw_board(screen, board, start_x, start_y, next_x, next_y)
             pygame.display.flip()
 
             for event in pygame.event.get():
@@ -103,7 +90,7 @@ def solve_knights_tour(screen, board, x, y, move_number, start_x, start_y):
 
             # Backtrack
             board[next_x][next_y] = -1
-            draw_board(screen, board, start_x, start_y)
+            draw_board(screen, board, start_x, start_y, next_x, next_y)
             pygame.display.flip()
 
             for event in pygame.event.get():
@@ -124,11 +111,12 @@ def main():
     # Initialize the chessboard with -1
     board = [[-1 for _ in range(BOARD_WIDTH)] for _ in range(BOARD_HEIGHT)]
 
-    # Get user input for the starting position
-    start_x, start_y = get_user_input()
+    # Get a random starting position
+    import random
+    start_x, start_y = random.randint(0, BOARD_HEIGHT - 1), random.randint(0, BOARD_WIDTH - 1)
     board[start_x][start_y] = 1
 
-    draw_board(screen, board, start_x, start_y)
+    draw_board(screen, board, start_x, start_y, start_x, start_y)
     pygame.display.flip()
 
     solve_knights_tour(screen, board, start_x, start_y, 2, start_x, start_y)
