@@ -2,9 +2,9 @@ import pygame
 import sys
 
 # Set the dimensions of the board
-BOARD_WIDTH = 24
+BOARD_WIDTH = 32
 BOARD_HEIGHT = 8
-CELL_SIZE = 30
+CELL_SIZE = 45
 WIDTH = BOARD_WIDTH * CELL_SIZE
 HEIGHT = BOARD_HEIGHT * CELL_SIZE
 
@@ -20,10 +20,8 @@ MOVES = [
     (-2, -1), (-1, -2), (1, -2), (2, -1)
 ]
 
-
 def is_valid_move(x, y, board):
     return 0 <= x < BOARD_HEIGHT and 0 <= y < BOARD_WIDTH and board[x][y] == -1
-
 
 def warnsdorff_order(x, y, board):
     # Return moves ordered by the number of accessible neighbors
@@ -31,10 +29,8 @@ def warnsdorff_order(x, y, board):
     sorted_moves = sorted(move_scores, key=lambda x: x[1])
     return [move[0] for move in sorted_moves]
 
-
 def count_accessible_neighbors(x, y, board):
     return sum(1 for move in MOVES if is_valid_move(x + move[0], y + move[1], board))
-
 
 def draw_board(screen, board, knight_positions):
     for i in range(BOARD_HEIGHT):
@@ -48,6 +44,11 @@ def draw_board(screen, board, knight_positions):
 
     for j in range(0, BOARD_WIDTH, 8):
         pygame.draw.rect(screen, (255, 255, 0), (j * CELL_SIZE, 0, 8 * CELL_SIZE, BOARD_HEIGHT * CELL_SIZE), 3)
+
+    # Draw additional yellow outlines for the modified structure
+    pygame.draw.rect(screen, (255, 255, 0), (8 * CELL_SIZE, 0, 24 * CELL_SIZE, 8 * CELL_SIZE), 3)
+    pygame.draw.rect(screen, (255, 255, 0), (0, 0, 8 * CELL_SIZE, BOARD_HEIGHT * CELL_SIZE), 3)
+    pygame.draw.rect(screen, (255, 255, 0), (32 * CELL_SIZE - 8 * CELL_SIZE, 0, 8 * CELL_SIZE, BOARD_HEIGHT * CELL_SIZE), 3)
 
     # Draw lines and hollow points for the knight's tour
     for i in range(len(knight_positions) - 1):
@@ -67,7 +68,6 @@ def draw_board(screen, board, knight_positions):
     pygame.draw.circle(screen, RED, (last_y * CELL_SIZE + CELL_SIZE // 2, last_x * CELL_SIZE + CELL_SIZE // 2), 5, 0)
 
     pygame.display.flip()
-
 
 def solve_knights_tour(screen, board, x, y, move_number, knight_positions):
     if move_number == BOARD_HEIGHT * BOARD_WIDTH + 1:
@@ -108,7 +108,6 @@ def solve_knights_tour(screen, board, x, y, move_number, knight_positions):
 
     return False
 
-
 def main():
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -117,9 +116,16 @@ def main():
     # Initialize the chessboard with -1
     board = [[-1 for _ in range(BOARD_WIDTH)] for _ in range(BOARD_HEIGHT)]
 
-    # Get a random starting position
-    import random
-    start_x, start_y = random.randint(0, BOARD_HEIGHT - 1), random.randint(0, BOARD_WIDTH - 1)
+    # Get user input for the starting position
+    user_choice = input("Do you want to specify the starting position? (y/n): ")
+    if user_choice.lower() == 'y':
+        start_x = int(input("Enter the row index (0 to 7): "))
+        start_y = int(input("Enter the column index (0 to 31): "))
+    else:
+        # Get a random starting position
+        import random
+        start_x, start_y = random.randint(0, BOARD_HEIGHT - 1), random.randint(0, BOARD_WIDTH - 1)
+
     board[start_x][start_y] = 1
 
     knight_positions = [(start_x, start_y)]  # Track knight's positions
@@ -137,7 +143,6 @@ def main():
 
     pygame.quit()
     sys.exit()
-
 
 if __name__ == "__main__":
     try:
